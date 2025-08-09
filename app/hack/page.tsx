@@ -9,18 +9,17 @@ const ImageWithFallback = ({ localSrc, externalSrc, alt }: { localSrc: string, e
   const [imgSrc, setImgSrc] = useState(localSrc);
 
   useEffect(() => {
-    setImgSrc(localSrc);
-  }, [localSrc]);
+    const img = new Image();
+    img.src = localSrc;
+    img.onerror = () => {
+      setImgSrc(externalSrc);
+    };
+  }, [localSrc, externalSrc]);
 
   return (
     <img
       src={imgSrc}
       alt={alt}
-      onError={() => {
-        if (imgSrc !== externalSrc) {
-          setImgSrc(externalSrc);
-        }
-      }}
       className="w-32 h-auto"
       loading="eager"
     />
