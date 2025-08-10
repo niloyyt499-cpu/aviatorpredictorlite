@@ -4,21 +4,27 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const ImageWithFallback = ({ localSrc, externalSrc, alt }: { localSrc: string, externalSrc: string, alt: string }) => {
+const ImageWithFallback = ({ localSrc, externalSrc, alt }: { localSrc: string, externalSrc: string, alt: string }) => {
   const [imgSrc, setImgSrc] = useState(localSrc);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const img = new Image();
-    img.src = localSrc;
-    img.onerror = () => {
-      setImgSrc(externalSrc);
-    };
-  }, [localSrc, externalSrc]);
+    setIsLoaded(false); // Reset loading state when src changes
+    setImgSrc(localSrc);
+  }, [localSrc]);
 
   return (
     <img
       src={imgSrc}
       alt={alt}
-      className="absolute inset-0 w-full h-full object-contain p-2"
+      onError={() => {
+        if (imgSrc !== externalSrc) {
+          setImgSrc(externalSrc);
+        }
+      }}
+      onLoad={() => setIsLoaded(true)} // Set loaded to true when image data is available
+      className="w-32 h-auto transition-opacity duration-300"
+      style={{ opacity: isLoaded ? 1 : 0 }} // Control visibility with opacity
       loading="eager"
     />
   );
