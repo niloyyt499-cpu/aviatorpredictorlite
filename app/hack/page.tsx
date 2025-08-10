@@ -174,7 +174,7 @@ function HackIdPageComponent() {
   }
 
   const LogoDisplay = () => (
-    <div className="pt-8 pl-6">
+    <div className="h-28 flex items-start pt-8 pl-6">
       <ImageWithFallback localSrc={logoPath} externalSrc={logoUrl} alt={platformName} />
     </div>
   )
