@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter }.from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
 // Corrected ImageWithFallback component to prevent showing broken images
